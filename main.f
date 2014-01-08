@@ -4,14 +4,7 @@
       dimension bxnb(nb),bynb(nb),txnb(nb),tynb(nb),qnxy(nxy),qnb(nb)
       real*8::dx=1.0,dy=1.0
 
-      integer i,j
-
-      dimension a(3,3),b(3),x(3)
-      data a/2,4,-2,2,7,4,3,7,5/
-      b = (/3,1,-7/)
-      x = (/0,0,0/)
-      call gauss(a,x,b,3)
-
+cc    test case  
       do i=1,nxy
       qnxy(i) = i/10.
       enddo
@@ -24,11 +17,10 @@
       qnb(i) = 1.15
       enddo
 
-
-
-
+      write(*,*) qnb(1)
       call solve(imax,jmax,dx,dy,qnxy,nxy,nb,bxnb,bynb,
      .    txnb,tynb,qnb)
+      write(*,*) qnb(1)
       end program
 
       subroutine solve(imax,jmax,dx,dy,qnxy,nxy,nb,bxnb,bynb,
@@ -95,11 +87,10 @@ cc    if node locate inner solid then set dis to maximum
       enddo
       closetp1tem = minloc(distob,1)
       closetp1 = surrps1(closetp1tem)
-      write(*,*) closetp1
+
       tx2 = csurrpsx(closetp1tem) - bx
       ty2 = csurrpsy(closetp1tem) - by
       costox = abs(tx2/sqrt(tx2**2+ty2**2))
-cc    0.86602 represent 30degree, 0.5 represent 60degree      
       if(tx2.gt.0 .and. ty2.gt.0) then
           if(costox .gt. cosmaxval) then
               p2 = closetp1 + 1
@@ -159,28 +150,10 @@ cc    0.86602 represent 30degree, 0.5 represent 60degree
       fai(1) = qnb(i)
       fai(2) = qnxy(p2)
       fai(3) = qnxy(p3)
-      do m=1,3
-      write(*,*) 'x=',cinter(m,2),'  y=',cinter(m,3),'q=',fai(m)
-      enddo
-      
-      
-      write(*,*) 'qnb=',qnb(i)
       call gauss(cinter,x,fai,3)
       qnb(i) = x(1) + x(2)*(mod(closetp1,imax)-1)*dx + 
      . x(3)*floor(real(closetp1/imax))*dy
-
-      write(*,*) closetp1,closetp1/imax,real(closetp1/imax)
-     . ,mod(closetp1,imax)-1,floor(real(closetp1/imax))
-      write(*,*) 'qnb=',qnb(i)
-
-
-
-
-
-      write(*,100) closetp1,p2,p3
       enddo
-
-          
   100 format('result is',3I10)   
       end subroutine
 
@@ -201,13 +174,11 @@ cc    0.86602 represent 30degree, 0.5 represent 60degree
       enddo
 
       do i=n,1,-1
-
       c=fai(i)
       do j=i+1,n
       c = c - a(i,j)*x(j)
       enddo
       x(i)=c/a(i,i)
-      write(*,*) i,"===",x(i)
       enddo
 
       end
