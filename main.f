@@ -6,7 +6,7 @@
 
       integer i,j
       dimension a(3,3),b(3),x(3)
-      a = (/2,4,-2,2,7,4,3,7,5/)
+      data a/2,4,-2,2,7,4,3,7,5/
       b = (/3,1,-7/)
       x = (/0,0,0/)
       
@@ -21,14 +21,13 @@
       tynb(i) = 0.1 
       qnb(i) = 10.4
       enddo
-      call gauss(a,x,b,3)
+cc      call gauss(a,x,b,3)
 
 
-cc      call solve(imax,jmax,dx,dy,qnxy,nxy,nb,bxnb,bynb,
-cc     .    txnb,tynb,qnb)
+      call solve(imax,jmax,dx,dy,qnxy,nxy,nb,bxnb,bynb,
+     .    txnb,tynb,qnb)
       end program
-
-      subroutine solve(imax,jmax,dx,dy,qnxy,nxy,nb,bxnb,bynb,
+       subroutine solve(imax,jmax,dx,dy,qnxy,nxy,nb,bxnb,bynb,
      .    txnb,tynb,qnb)
 cc    imax: the num of nodes in x direction
 cc    jmax: the num of nodes in y direction
@@ -173,6 +172,8 @@ cc    0.86602 represent 30degree, 0.5 represent 60degree
           
   100 format('result is',3I10)   
       end subroutine
+
+
 
       subroutine gauss(a,x,fai,n)
       implicit real*8(a-h,o-z)
