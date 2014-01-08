@@ -5,17 +5,26 @@
       real*8::dx=1.0,dy=1.0
 
       integer i,j
+
+      dimension a(3,3),b(3),x(3)
+      data a/2,4,-2,2,7,4,3,7,5/
+      b = (/3,1,-7/)
+      x = (/0,0,0/)
+      call gauss(a,x,b,3)
+
       do i=1,nxy
       qnxy(i) = i/10.
       enddo
       
       do i=1,nb
-      bxnb(i) = 1.3
-      bynb(i) = 1.7
+      bxnb(i) = 1.2
+      bynb(i) = 1.8
       txnb(i) = 0.0
       tynb(i) = 0.1 
-      qnb(i) = 10.4
+      qnb(i) = 1.15
       enddo
+
+
 
 
       call solve(imax,jmax,dx,dy,qnxy,nxy,nb,bxnb,bynb,
@@ -150,11 +159,18 @@ cc    0.86602 represent 30degree, 0.5 represent 60degree
       fai(1) = qnb(i)
       fai(2) = qnxy(p2)
       fai(3) = qnxy(p3)
+      do m=1,3
+      write(*,*) 'x=',cinter(m,2),'  y=',cinter(m,3),'q=',fai(m)
+      enddo
+      
       
       write(*,*) 'qnb=',qnb(i)
       call gauss(cinter,x,fai,3)
       qnb(i) = x(1) + x(2)*(mod(closetp1,imax)-1)*dx + 
      . x(3)*floor(real(closetp1/imax))*dy
+
+      write(*,*) closetp1,closetp1/imax,real(closetp1/imax)
+     . ,mod(closetp1,imax)-1,floor(real(closetp1/imax))
       write(*,*) 'qnb=',qnb(i)
 
 
@@ -179,8 +195,8 @@ cc    0.86602 represent 30degree, 0.5 represent 60degree
       c = a(j,i)/a(i,i)
       do k=i,n
       a(j,k) = a(j,k) - c*a(i,k)
-      fai(j) = fai(j) - c*fai(i)
       enddo
+      fai(j) = fai(j) - c*fai(i)
       enddo
       enddo
 
@@ -191,7 +207,7 @@ cc    0.86602 represent 30degree, 0.5 represent 60degree
       c = c - a(i,j)*x(j)
       enddo
       x(i)=c/a(i,i)
-      write(*,*) n,"===",x(i)
+      write(*,*) i,"===",x(i)
       enddo
 
       end
