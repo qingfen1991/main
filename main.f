@@ -5,11 +5,6 @@
       real*8::dx=1.0,dy=1.0
 
       integer i,j
-      dimension a(3,3),b(3),x(3)
-      data a/2,4,-2,2,7,4,3,7,5/
-      b = (/3,1,-7/)
-      x = (/0,0,0/)
-      
       do i=1,nxy
       qnxy(i) = i/10.
       enddo
@@ -21,13 +16,13 @@
       tynb(i) = 0.1 
       qnb(i) = 10.4
       enddo
-cc      call gauss(a,x,b,3)
 
 
       call solve(imax,jmax,dx,dy,qnxy,nxy,nb,bxnb,bynb,
      .    txnb,tynb,qnb)
       end program
-       subroutine solve(imax,jmax,dx,dy,qnxy,nxy,nb,bxnb,bynb,
+
+      subroutine solve(imax,jmax,dx,dy,qnxy,nxy,nb,bxnb,bynb,
      .    txnb,tynb,qnb)
 cc    imax: the num of nodes in x direction
 cc    jmax: the num of nodes in y direction
@@ -45,8 +40,8 @@ cc    nxy: total num of nodes
       integer i,j,bxmin,bxmax,bymin,bymax,p2,p3,closetp1,closetp1tem
 cc    closetp1 must be dimensioned for using minloc
       integer,dimension(4)::surrps1,surrps2
-      dimension csurrpsx(4),csurrpsy(4),distob(4),cinter(3,3),
-     . a(3),fai(3)
+      dimension csurrpsx(4),csurrpsy(4),distob(4),cinter(3,3),fai(3),
+     . x(3) 
       real*8 bx,by,cosval,distobtem,costox,costoy
       real*8,parameter::cosminval=0.5,cosmaxval=0.86602
       do i=1, nb
@@ -91,6 +86,7 @@ cc    if node locate inner solid then set dis to maximum
       enddo
       closetp1tem = minloc(distob,1)
       closetp1 = surrps1(closetp1tem)
+      write(*,*) closetp1
       tx2 = csurrpsx(closetp1tem) - bx
       ty2 = csurrpsy(closetp1tem) - by
       costox = abs(tx2/sqrt(tx2**2+ty2**2))
@@ -104,7 +100,7 @@ cc    0.86602 represent 30degree, 0.5 represent 60degree
               p3 = closetp1 + imax
           else
               p2 = closetp1 + imax
-              p3 = closetp1 + imax + 1
+              p3 = closetp1 + imax +1
           endif
       else if(tx2.lt.0 .and. ty2.gt.0) then
           if(costox .gt. cosmaxval) then
@@ -115,7 +111,7 @@ cc    0.86602 represent 30degree, 0.5 represent 60degree
               p3 = closetp1 + imax
           else
               p2 = closetp1 + imax
-              p3 = closetp1 + imax - 1
+              p3 = closetp1 + imax -1
           endif
       else if(tx2.lt.0 .and. ty2.lt.0) then
           if(costox .gt. cosmaxval) then
@@ -141,27 +137,26 @@ cc    0.86602 represent 30degree, 0.5 represent 60degree
           endif
       endif
 
-
       do k=1,3
       cinter(k,1) = 1
       enddo
       cinter(1,2) = bx
       cinter(1,3) = by
-      cinter(2,2) = (p2%imax - 1)*dx
-      cinter(2,3) = floor(p2/imax)*dy
-      cinter(3,2) = (p3%imax - 1)*dx
-      cinter(3,3) = floor(p3/imax)*dy
+      cinter(2,2) = (mod(p2,imax) - 1)*dx
+      cinter(2,3) = floor(real(p2/imax))*dy
+      cinter(3,2) = (mod(p3,imax) - 1)*dx
+      cinter(3,3) = floor(real(p3/imax))*dy
+      
       fai(1) = qnb(i)
       fai(2) = qnxy(p2)
       fai(3) = qnxy(p3)
-
-
-
-
-
-
       
-      
+      write(*,*) 'qnb=',qnb(i)
+      call gauss(cinter,x,fai,3)
+      qnb(i) = x(1) + x(2)*(mod(closetp1,imax)-1)*dx + 
+     . x(3)*floor(real(closetp1/imax))*dy
+      write(*,*) 'qnb=',qnb(i)
+
 
 
 
@@ -172,8 +167,6 @@ cc    0.86602 represent 30degree, 0.5 represent 60degree
           
   100 format('result is',3I10)   
       end subroutine
-
-
 
       subroutine gauss(a,x,fai,n)
       implicit real*8(a-h,o-z)
@@ -191,14 +184,14 @@ cc    0.86602 represent 30degree, 0.5 represent 60degree
       enddo
       enddo
 
-      do i=n,1
+      do i=n,1,-1
+
       c=fai(i)
       do j=i+1,n
       c = c - a(i,j)*x(j)
       enddo
       x(i)=c/a(i,i)
-      write(*,*) fai(i)
+      write(*,*) n,"===",x(i)
       enddo
 
       end
-
