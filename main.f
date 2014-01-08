@@ -10,10 +10,10 @@
       enddo
       
       do i=1,nb
-      bxnb(i) = 1.1
-      bynb(i) = 1.1
-      txnb(i) = -0.1
-      tynb(i) = 2.0
+      bxnb(i) = 1.3
+      bynb(i) = 1.7
+      txnb(i) = 0.0
+      tynb(i) = 0.1 
       qnb(i) = 10.4
       enddo
 
@@ -37,9 +37,8 @@ cc    nxy: total num of nodes
       real*8 dx,dy
 
 
-      integer i,j,bxmin,bxmax,bymin,bymax,p2,p3
+      integer i,j,bxmin,bxmax,bymin,bymax,p2,p3,closetp1,closetp1tem
 cc    closetp1 must be dimensioned for using minloc
-      integer,dimension(1)::closetp1,closetp1tem
       integer,dimension(4)::surrps1,surrps2
       dimension csurrpsx(4),csurrpsy(4),distob(4)
       real*8 bx,by,cosval,distobtem,costox,costoy
@@ -84,7 +83,7 @@ cc    if node locate inner solid then set dis to maximum
           distob(j) = distobtem
       endif
       enddo
-      closetp1tem = minloc(distob)
+      closetp1tem = minloc(distob,1)
       closetp1 = surrps1(closetp1tem)
       write(*,*) closetp1
       tx2 = csurrpsx(closetp1tem) - bx
