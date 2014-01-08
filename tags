@@ -1,0 +1,17 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+100	main.f	/^  100 format('result is',2F10.2)   $/;"	l	subroutine:solve	file:
+dx	main.f	/^      real*8::dx=/;"	v	program:main
+dy	main.f	/^      real*8::dx=1.0,dy=/;"	v	program:main
+i	main.f	/^      in/;"	v	program:main
+imax	main.f	/^      integer,parameter::imax=/;"	v	program:main
+j	main.f	/^      integer i,j$/;"	v	program:main
+jmax	main.f	/^      integer,parameter::imax=5,jmax=/;"	v	program:main
+main	main.f	/^      program main$/;"	p
+nb	main.f	/^      integer,parameter::imax=5,jmax=5,nxy=25,nb=/;"	v	program:main
+nxy	main.f	/^      integer,parameter::imax=5,jmax=5,nxy=/;"	v	program:main
+solve	main.f	/^      subroutine solve(/;"	s
