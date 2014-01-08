@@ -39,11 +39,11 @@ cc    nxy: total num of nodes
 
       integer i,j,bxmin,bxmax,bymin,bymax,p2,p3
 cc    closetp1 must be dimensioned for using minloc
-      integer,dimension(1)::closetp1
+      integer,dimension(1)::closetp1,closetp1tem
       integer,dimension(4)::surrps1,surrps2
       dimension csurrpsx(4),csurrpsy(4),distob(4)
-      real*8 bx,by,cosval,distobtem
-
+      real*8 bx,by,cosval,distobtem,costox,costoy
+      real*8,parameter::cosminval=0.5,cosmaxval=0.86602
       do i=1, nb
       bx = bxnb(i)
       by = bynb(i)
@@ -69,15 +69,13 @@ cc    closetp1 must be dimensioned for using minloc
       csurrpsy(4) = bymax * dy
 cc    find the closet point  
       do j=1, 4
-cc    caculate angle between boundary point and every nodes
       tx2 = csurrpsx(j) - bx
       ty2 = csurrpsy(j) - by
       distobtem = sqrt(tx2**2 + ty2**2)
 
+cc    caculate cosine of angle between two vectors
       cosval = (txnb(i)*tx2 + tynb(i)*ty2)/
      . (distobtem*sqrt(txnb(i)**2+tynb(i)**2))
-
-      write(*,*) 'cos is:',cosval
 
       if(cosval .lt. 0) then
 cc    if node locate inner solid then set dis to maximum          
@@ -86,12 +84,65 @@ cc    if node locate inner solid then set dis to maximum
           distob(j) = distobtem
       endif
       enddo
-      closetp1 = minloc(distob)
+      closetp1tem = minloc(distob)
+      closetp1 = surrps1(closetp1tem)
+      write(*,*) closetp1
+      tx2 = csurrpsx(closetp1tem) - bx
+      ty2 = csurrpsy(closetp1tem) - by
+      costox = abs(tx2/sqrt(tx2**2+ty2**2))
+cc    0.86602 represent 30degree, 0.5 represent 60degree      
+      if(tx2.gt.0 .and. ty2.gt.0) then
+          if(costox .gt. cosmaxval) then
+              p2 = closetp1 + 1
+              p3 = closetp1 + imax + 1
+          else if(costox.gt.cosminval .and. costox.lt.cosmaxval) then
+              p2 = closetp1 + 1
+              p3 = closetp1 + imax
+          else
+              p2 = closetp1 + imax
+              p3 = closetp1 + imax +1
+          endif
+      else if(tx2.lt.0 .and. ty2.gt.0) then
+          if(costox .gt. cosmaxval) then
+              p2 = closetp1 - 1
+              p3 = closetp1 + imax - 1
+          else if(costox.gt.cosminval .and. costox.lt.cosmaxval) then
+              p2 = closetp1 - 1
+              p3 = closetp1 + imax
+          else
+              p2 = closetp1 + imax
+              p3 = closetp1 + imax -1
+          endif
+      else if(tx2.lt.0 .and. ty2.lt.0) then
+          if(costox .gt. cosmaxval) then
+              p2 = closetp1 - 1
+              p3 = closetp1 - imax - 1
+          else if(costox.gt.cosminval .and. costox.lt.cosmaxval) then
+              p2 = closetp1 - 1
+              p3 = closetp1 - imax
+          else
+              p2 = closetp1 - imax
+              p3 = closetp1 - imax - 1
+          endif
+      else if(tx2.gt.0 .and. ty2.lt.0) then
+          if(costox .gt. cosmaxval) then
+              p2 = closetp1 + 1
+              p3 = closetp1 - imax + 1
+          else if(costox.gt.cosminval .and. costox.lt.cosmaxval) then
+              p2 = closetp1 + 1
+              p3 = closetp1 - imax
+          else
+              p2 = closetp1 - imax
+              p3 = closetp1 - imax + 1
+          endif
+      endif
 
-      write(*,100) closetp1
+
+
+      write(*,100) closetp1,p2,p3
       enddo
 
           
-  100 format('result is',I10)   
+  100 format('result is',3I10)   
       end subroutine
 
