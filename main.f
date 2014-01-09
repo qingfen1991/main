@@ -88,7 +88,8 @@ cc    if node locate inner solid then set dis to maximum
       closetp1tem = minloc(distob,1)
       closetp1 = surrps1(closetp1tem)
 
-      if(1 .lt 2) then
+      if(closetp1/imax.eq.0 .or. closetp1/imax.eq.(jmax-1) 
+     ..or. mod(closetp1,imax).eq.0 .or. mod(closetp1,imax).eq.1) then
 cc    ==================boundary without interpolate==============  
           qnb(i) = qnxy(closetp1)
       else
