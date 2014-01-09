@@ -4,14 +4,15 @@
       dimension bxnb(nb),bynb(nb),txnb(nb),tynb(nb),qnxy(nxy),qnb(nb)
       real*8::dx=1.0,dy=1.0
 
+
 cc    test case  
       do i=1,nxy
       qnxy(i) = i/10.
       enddo
       
       do i=1,nb
-      bxnb(i) = 1.2
-      bynb(i) = 1.8
+      bxnb(i) = 2.8
+      bynb(i) = 0.2
       txnb(i) = 0.0
       tynb(i) = 0.1 
       qnb(i) = 1.15
@@ -39,7 +40,6 @@ cc    nxy: total num of nodes
 
 
       integer i,j,bxmin,bxmax,bymin,bymax,p2,p3,closetp1,closetp1tem
-cc    closetp1 must be dimensioned for using minloc
       integer,dimension(4)::surrps1,surrps2
       dimension csurrpsx(4),csurrpsy(4),distob(4),cinter(3,3),fai(3),
      . x(3) 
@@ -88,71 +88,86 @@ cc    if node locate inner solid then set dis to maximum
       closetp1tem = minloc(distob,1)
       closetp1 = surrps1(closetp1tem)
 
-      tx2 = csurrpsx(closetp1tem) - bx
-      ty2 = csurrpsy(closetp1tem) - by
-      costox = abs(tx2/sqrt(tx2**2+ty2**2))
-      if(tx2.gt.0 .and. ty2.gt.0) then
-          if(costox .gt. cosmaxval) then
-              p2 = closetp1 + 1
-              p3 = closetp1 + imax + 1
-          else if(costox.gt.cosminval .and. costox.lt.cosmaxval) then
-              p2 = closetp1 + 1
-              p3 = closetp1 + imax
-          else
-              p2 = closetp1 + imax
-              p3 = closetp1 + imax +1
-          endif
-      else if(tx2.lt.0 .and. ty2.gt.0) then
-          if(costox .gt. cosmaxval) then
-              p2 = closetp1 - 1
-              p3 = closetp1 + imax - 1
-          else if(costox.gt.cosminval .and. costox.lt.cosmaxval) then
-              p2 = closetp1 - 1
-              p3 = closetp1 + imax
-          else
-              p2 = closetp1 + imax
-              p3 = closetp1 + imax -1
-          endif
-      else if(tx2.lt.0 .and. ty2.lt.0) then
-          if(costox .gt. cosmaxval) then
-              p2 = closetp1 - 1
-              p3 = closetp1 - imax - 1
-          else if(costox.gt.cosminval .and. costox.lt.cosmaxval) then
-              p2 = closetp1 - 1
-              p3 = closetp1 - imax
-          else
-              p2 = closetp1 - imax
-              p3 = closetp1 - imax - 1
-          endif
-      else if(tx2.gt.0 .and. ty2.lt.0) then
-          if(costox .gt. cosmaxval) then
-              p2 = closetp1 + 1
-              p3 = closetp1 - imax + 1
-          else if(costox.gt.cosminval .and. costox.lt.cosmaxval) then
-              p2 = closetp1 + 1
-              p3 = closetp1 - imax
-          else
-              p2 = closetp1 - imax
-              p3 = closetp1 - imax + 1
-          endif
-      endif
+      if(1 .lt 2) then
+cc    ==================boundary without interpolate==============  
+          qnb(i) = qnxy(closetp1)
+      else
 
-      do k=1,3
-      cinter(k,1) = 1
-      enddo
-      cinter(1,2) = bx
-      cinter(1,3) = by
-      cinter(2,2) = (mod(p2,imax) - 1)*dx
-      cinter(2,3) = floor(real(p2/imax))*dy
-      cinter(3,2) = (mod(p3,imax) - 1)*dx
-      cinter(3,3) = floor(real(p3/imax))*dy
-      
-      fai(1) = qnb(i)
-      fai(2) = qnxy(p2)
-      fai(3) = qnxy(p3)
-      call gauss(cinter,x,fai,3)
-      qnb(i) = x(1) + x(2)*(mod(closetp1,imax)-1)*dx + 
-     . x(3)*floor(real(closetp1/imax))*dy
+          tx2 = csurrpsx(closetp1tem) - bx
+          ty2 = csurrpsy(closetp1tem) - by
+          costox = abs(tx2/sqrt(tx2**2+ty2**2))
+          if(tx2.gt.0 .and. ty2.gt.0) then
+              if(costox .gt. cosmaxval) then
+                  p2 = closetp1 + 1
+                  p3 = closetp1 + imax + 1
+              else if(costox.gt.cosminval .and. costox.lt.cosmaxval) then
+                  p2 = closetp1 + 1
+                  p3 = closetp1 + imax
+              else
+                  p2 = closetp1 + imax
+                  p3 = closetp1 + imax +1
+              endif
+          else if(tx2.lt.0 .and. ty2.gt.0) then
+              if(costox .gt. cosmaxval) then
+                  p2 = closetp1 - 1
+                  p3 = closetp1 + imax - 1
+              else if(costox.gt.cosminval .and. costox.lt.cosmaxval) then
+                  p2 = closetp1 - 1
+                  p3 = closetp1 + imax
+              else
+                  p2 = closetp1 + imax
+                  p3 = closetp1 + imax -1
+              endif
+          else if(tx2.lt.0 .and. ty2.lt.0) then
+              if(costox .gt. cosmaxval) then
+                  p2 = closetp1 - 1
+                  p3 = closetp1 - imax - 1
+              else if(costox.gt.cosminval .and. costox.lt.cosmaxval) then
+                  p2 = closetp1 - 1
+                  p3 = closetp1 - imax
+              else
+                  p2 = closetp1 - imax
+                  p3 = closetp1 - imax - 1
+              endif
+          else if(tx2.gt.0 .and. ty2.lt.0) then
+              if(costox .gt. cosmaxval) then
+                  p2 = closetp1 + 1
+                  p3 = closetp1 - imax + 1
+              else if(costox.gt.cosminval .and. costox.lt.cosmaxval) then
+                  p2 = closetp1 + 1
+                  p3 = closetp1 - imax
+              else
+                  p2 = closetp1 - imax
+                  p3 = closetp1 - imax + 1
+              endif
+          endif
+
+          do k=1,3
+          cinter(k,1) = 1
+          enddo
+          cinter(1,2) = bx
+          cinter(1,3) = by
+          if(mod(p2,imax) .eq. 0) then
+              cinter(2,2) = (mod(p2,imax) - 1)*dx
+          else
+              cinter(2,2) = (imax - 1)*dx
+          endif
+          cinter(2,3) = floor(real(p2/imax))*dy
+cc    take care of the boundary     
+          if(mod(p3,imax) .eq. 0) then
+              cinter(3,2) = (mod(p3,imax) - 1)*dx
+          else 
+              cinter(3,2) = (imax - 1)*dx
+          endif
+          cinter(3,3) = floor(real(p3/imax))*dy
+          
+          fai(1) = qnb(i)
+          fai(2) = qnxy(p2)
+          fai(3) = qnxy(p3)
+          call gauss(cinter,x,fai,3)
+          qnb(i) = x(1) + x(2)*(mod(closetp1,imax)-1)*dx + 
+         . x(3)*floor(real(closetp1/imax))*dy
+      endif
       enddo
   100 format('result is',3I10)   
       end subroutine
