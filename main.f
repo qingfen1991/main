@@ -11,7 +11,7 @@ cc    test case
       enddo
       
       do i=1,nb
-      bxnb(i) = 2.8
+      bxnb(i) = 3.8
       bynb(i) = 0.2
       txnb(i) = 0.0
       tynb(i) = 0.1 
@@ -88,11 +88,13 @@ cc    if node locate inner solid then set dis to maximum
       closetp1tem = minloc(distob,1)
       closetp1 = surrps1(closetp1tem)
 
+cc    ==================take care of boundary==============  
       if(closetp1/imax.eq.0 .or. closetp1/imax.eq.(jmax-1) 
      ..or. mod(closetp1,imax).eq.0 .or. mod(closetp1,imax).eq.1) then
-cc    ==================boundary without interpolate==============  
-          qnb(i) = qnxy(closetp1)
+cc    no interpolation on the boundary      
+        qnb(i) = qnxy(closetp1)
       else
+cc    start interpolating          
 
           tx2 = csurrpsx(closetp1tem) - bx
           ty2 = csurrpsy(closetp1tem) - by
@@ -101,7 +103,7 @@ cc    ==================boundary without interpolate==============
               if(costox .gt. cosmaxval) then
                   p2 = closetp1 + 1
                   p3 = closetp1 + imax + 1
-              else if(costox.gt.cosminval .and. costox.lt.cosmaxval) then
+              else if(costox.gt.cosminval .and. costox.lt.cosmaxval)then 
                   p2 = closetp1 + 1
                   p3 = closetp1 + imax
               else
@@ -112,7 +114,7 @@ cc    ==================boundary without interpolate==============
               if(costox .gt. cosmaxval) then
                   p2 = closetp1 - 1
                   p3 = closetp1 + imax - 1
-              else if(costox.gt.cosminval .and. costox.lt.cosmaxval) then
+              else if(costox.gt.cosminval .and. costox.lt.cosmaxval)then
                   p2 = closetp1 - 1
                   p3 = closetp1 + imax
               else
@@ -123,7 +125,7 @@ cc    ==================boundary without interpolate==============
               if(costox .gt. cosmaxval) then
                   p2 = closetp1 - 1
                   p3 = closetp1 - imax - 1
-              else if(costox.gt.cosminval .and. costox.lt.cosmaxval) then
+              else if(costox.gt.cosminval .and. costox.lt.cosmaxval)then
                   p2 = closetp1 - 1
                   p3 = closetp1 - imax
               else
@@ -134,7 +136,7 @@ cc    ==================boundary without interpolate==============
               if(costox .gt. cosmaxval) then
                   p2 = closetp1 + 1
                   p3 = closetp1 - imax + 1
-              else if(costox.gt.cosminval .and. costox.lt.cosmaxval) then
+              else if(costox.gt.cosminval .and. costox.lt.cosmaxval)then
                   p2 = closetp1 + 1
                   p3 = closetp1 - imax
               else
@@ -154,7 +156,7 @@ cc    ==================boundary without interpolate==============
               cinter(2,2) = (imax - 1)*dx
           endif
           cinter(2,3) = floor(real(p2/imax))*dy
-cc    take care of the boundary     
+cc        take care of the boundary     
           if(mod(p3,imax) .eq. 0) then
               cinter(3,2) = (mod(p3,imax) - 1)*dx
           else 
@@ -167,7 +169,7 @@ cc    take care of the boundary
           fai(3) = qnxy(p3)
           call gauss(cinter,x,fai,3)
           qnb(i) = x(1) + x(2)*(mod(closetp1,imax)-1)*dx + 
-         . x(3)*floor(real(closetp1/imax))*dy
+     .             x(3)*floor(real(closetp1/imax))*dy
       endif
       enddo
   100 format('result is',3I10)   
