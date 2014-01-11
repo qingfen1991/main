@@ -1,30 +1,34 @@
       program main
       implicit real*8 (a-h,o-z)
       integer,parameter::imax=5,jmax=5,nxy=25,nb=1
-      dimension bxnb(nb),bynb(nb),txnb(nb),tynb(nb),qnxy(nxy),qnb(nb)
+      dimension bxnb(nb),bynb(nb),txnb(nb),tynb(nb),qnxy(nxy),qnb(nb),
+     .          in_flag(nxy) 
       real*8::dx=1.0,dy=1.0
-
-
 cc    test case  
       do i=1,nxy
       qnxy(i) = i/10.
+      in_flag(i) = 0
       enddo
+      in_flag(1) = 1
+      in_flag(2) = 1
+      in_flag(6) = 1
+
       
       do i=1,nb
-      bxnb(i) = 3.8
-      bynb(i) = 0.2
+      bxnb(i) = 0.1
+      bynb(i) = 0.1
       txnb(i) = 0.0
       tynb(i) = 0.1 
       qnb(i) = 1.15
       enddo
 
       write(*,*) qnb(1)
-      call solve(imax,jmax,dx,dy,qnxy,nxy,nb,bxnb,bynb,
+      call solve(imax,jmax,dx,dy,qnxy,nxy,in_flag,nb,bxnb,bynb,
      .    txnb,tynb,qnb)
       write(*,*) qnb(1)
       end program
 
-      subroutine solve(imax,jmax,dx,dy,qnxy,nxy,nb,bxnb,bynb,
+      subroutine solve(imax,jmax,dx,dy,qnxy,nxy,in_flag,nb,bxnb,bynb,
      .    txnb,tynb,qnb)
 cc    imax: the num of nodes in x direction
 cc    jmax: the num of nodes in y direction
@@ -35,12 +39,13 @@ cc    nxy: total num of nodes
 
       implicit real*8 (a-h,o-z)
       integer imax,jmax,nxy,nb
-      dimension bxnb(nb),bynb(nb),txnb(nb),tynb(nb),qnxy(nxy),qnb(nb)
+      dimension bxnb(nb),bynb(nb),txnb(nb),tynb(nb),qnxy(nxy),qnb(nb),
+     .in_flag(nxy)
       real*8 dx,dy
 
 
       integer i,j,bxmin,bxmax,bymin,bymax,p2,p3,closetp1,closetp1tem
-      integer,dimension(4)::surrps1,surrps2
+      integer surrps(4)
       dimension csurrpsx(4),csurrpsy(4),distob(4),cinter(3,3),fai(3),
      . x(3) 
       real*8 bx,by,cosval,distobtem,costox,costoy
@@ -54,10 +59,10 @@ cc    nxy: total num of nodes
       bymin = floor(by/dy)
       bymax = bymin + 1
 
-      surrps1(1) = bymin*imax + bxmin + 1
-      surrps1(2) = bymin*imax + bxmax + 1
-      surrps1(3) = bymax*imax + bxmin + 1
-      surrps1(4) = bymax*imax + bxmax + 1
+      surrps(1) = bymin*imax + bxmin + 1
+      surrps(2) = bymin*imax + bxmax + 1
+      surrps(3) = bymax*imax + bxmin + 1
+      surrps(4) = bymax*imax + bxmax + 1
 
       csurrpsx(1) = bxmin * dx
       csurrpsx(2) = bxmax * dx
@@ -75,10 +80,10 @@ cc    find the closet point
       distobtem = sqrt(tx2**2 + ty2**2)
 
 cc    caculate cosine of angle between two vectors
-      cosval = (txnb(i)*tx2 + tynb(i)*ty2)/
-     . (distobtem*sqrt(txnb(i)**2+tynb(i)**2))
+cc--      cosval = (txnb(i)*tx2 + tynb(i)*ty2)/
+cc--     . (distobtem*sqrt(txnb(i)**2+tynb(i)**2))
 
-      if(cosval .lt. 0) then
+      if(in_flag(surrps(j)) .eq. 1) then
 cc    if node locate inner solid then set dis to maximum          
           distob(j) = sqrt(dx**2+dy**2) + 1
       else 
@@ -86,7 +91,7 @@ cc    if node locate inner solid then set dis to maximum
       endif
       enddo
       closetp1tem = minloc(distob,1)
-      closetp1 = surrps1(closetp1tem)
+      closetp1 = surrps(closetp1tem)
 
 cc    ==================take care of boundary==============  
       if(closetp1/imax.eq.0 .or. closetp1/imax.eq.(jmax-1) 
