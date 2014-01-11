@@ -1,13 +1,16 @@
       program main
       implicit real*8 (a-h,o-z)
-      integer,parameter::imax=5,jmax=5,nxy=25,nb=1
+      integer imax,jmax,nxy,nb
+      parameter(imax=5,jmax=5,nxy=25,nb=1)
       dimension bxnb(nb),bynb(nb),txnb(nb),tynb(nb),qnxy(nxy),qnb(nb),
      .          in_flag(nxy) 
-      real*8::dx=1.0,dy=1.0
+      real*8 dx,dy
+      dx = 1.0
+      dy = 1.0
 cc    test case  
       do i=1,nxy
-      qnxy(i) = i/10.
-      in_flag(i) = 0
+          qnxy(i) = i/10.
+          in_flag(i) = 0
       enddo
       in_flag(1) = 1
       in_flag(2) = 1
@@ -15,11 +18,11 @@ cc    test case
 
       
       do i=1,nb
-      bxnb(i) = 0.1
-      bynb(i) = 0.1
-      txnb(i) = 0.0
-      tynb(i) = 0.1 
-      qnb(i) = 1.15
+          bxnb(i) = 0.1
+          bynb(i) = 0.1
+          txnb(i) = 0.0
+          tynb(i) = 0.1 
+          qnb(i) = 1.15
       enddo
 
       write(*,*) qnb(1)
@@ -44,12 +47,12 @@ cc    nxy: total num of nodes
       real*8 dx,dy
 
 
-      integer i,j,bxmin,bxmax,bymin,bymax,p2,p3,closetp1,closetp1tem
-      integer surrps(4)
+      integer i,j,bxmin,bxmax,bymin,bymax,p2,p3,closetp1,closetp1tem,
+     . surrps(4)
       dimension csurrpsx(4),csurrpsy(4),distob(4),cinter(3,3),fai(3),
      . x(3) 
-      real*8 bx,by,cosval,distobtem,costox,costoy
-      real*8,parameter::cosminval=0.5,cosmaxval=0.86602
+      real*8 bx,by,cosval,distobtem,costox,costoy,cosminval,cosmaxval
+      parameter(cosminval=0.5,cosmaxval=0.86602)
       do i=1, nb
       bx = bxnb(i)
       by = bynb(i)
