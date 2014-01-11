@@ -2,7 +2,7 @@
       implicit real*8 (a-h,o-z)
       integer imax,jmax,nxy,nb
       parameter(imax=5,jmax=5,nxy=25,nb=1)
-      dimension bxnb(nb),bynb(nb),txnb(nb),tynb(nb),qnxy(nxy),qnb(nb),
+      dimension bxnb(nb),bynb(nb),qnxy(nxy),qnb(nb),
      .          in_flag(nxy) 
       real*8 dx,dy
       dx = 1.0
@@ -20,19 +20,17 @@ cc    test case
       do i=1,nb
           bxnb(i) = 0.1
           bynb(i) = 0.1
-          txnb(i) = 0.0
-          tynb(i) = 0.1 
           qnb(i) = 1.15
       enddo
 
       write(*,*) qnb(1)
       call solve(imax,jmax,dx,dy,qnxy,nxy,in_flag,nb,bxnb,bynb,
-     .    txnb,tynb,qnb)
+     .    qnb)
       write(*,*) qnb(1)
       end program
 
       subroutine solve(imax,jmax,dx,dy,qnxy,nxy,in_flag,nb,bxnb,bynb,
-     .    txnb,tynb,qnb)
+     .    qnb)
 cc    imax: the num of nodes in x direction
 cc    jmax: the num of nodes in y direction
 cc    dxnxy: dimension in x direction of a cell 
@@ -42,7 +40,7 @@ cc    nxy: total num of nodes
 
       implicit real*8 (a-h,o-z)
       integer imax,jmax,nxy,nb
-      dimension bxnb(nb),bynb(nb),txnb(nb),tynb(nb),qnxy(nxy),qnb(nb),
+      dimension bxnb(nb),bynb(nb),qnxy(nxy),qnb(nb),
      .in_flag(nxy)
       real*8 dx,dy
 
