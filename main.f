@@ -7,6 +7,7 @@
       real*8 dx,dy
       dx = 1.0
       dy = 1.0
+
 cc    test case  
       do i=1,nxy
           qnxy(i) = i/10.
@@ -37,6 +38,11 @@ cc    dxnxy: dimension in x direction of a cell
 cc    dynxy: dimension in y direction of a cell 
 cc    qnxy: value stored in nodes
 cc    nxy: total num of nodes 
+cc    in_flag: 1 means the node is in solid,0 means not
+cc    nb: total num of boundary points
+cc    bxnb: x values of boundary points
+cc    bynb: y values of boundary points
+cc    qnb: value stored in boundary points
 
       implicit real*8 (a-h,o-z)
       integer imax,jmax,nxy,nb
@@ -49,7 +55,7 @@ cc    nxy: total num of nodes
      . surrps(4)
       dimension csurrpsx(4),csurrpsy(4),distob(4),cinter(3,3),fai(3),
      . x(3) 
-      real*8 bx,by,cosval,distobtem,costox,costoy,cosminval,cosmaxval
+      real*8 bx,by,cosval,dismax,costox,costoy,cosminval,cosmaxval
       parameter(cosminval=0.5,cosmaxval=0.86602)
       do i=1, nb
       bx = bxnb(i)
@@ -78,23 +84,19 @@ cc    find the closet point
       do j=1, 4
       tx2 = csurrpsx(j) - bx
       ty2 = csurrpsy(j) - by
-      distobtem = sqrt(tx2**2 + ty2**2)
-
-cc    caculate cosine of angle between two vectors
-cc--      cosval = (txnb(i)*tx2 + tynb(i)*ty2)/
-cc--     . (distobtem*sqrt(txnb(i)**2+tynb(i)**2))
+      dismax = sqrt(tx2**2 + ty2**2)
 
       if(in_flag(surrps(j)) .eq. 1) then
-cc    if node locate inner solid then set dis to maximum          
+cc    if node locates inner solid then set dis to maximum          
           distob(j) = sqrt(dx**2+dy**2) + 1
       else 
-          distob(j) = distobtem
+          distob(j) = dismax
       endif
       enddo
       closetp1tem = minloc(distob,1)
       closetp1 = surrps(closetp1tem)
 
-cc    ==================take care of boundary==============  
+cc    =====If start=============take care of boundary==============  
       if(closetp1/imax.eq.0 .or. closetp1/imax.eq.(jmax-1) 
      ..or. mod(closetp1,imax).eq.0 .or. mod(closetp1,imax).eq.1) then
 cc    no interpolation on the boundary      
@@ -177,6 +179,7 @@ cc        take care of the boundary
           qnb(i) = x(1) + x(2)*(mod(closetp1,imax)-1)*dx + 
      .             x(3)*floor(real(closetp1/imax))*dy
       endif
+cc    =====If end=============take care of boundary==============  
       enddo
   100 format('result is',3I10)   
       end subroutine
