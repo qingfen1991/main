@@ -1,3 +1,4 @@
+      牛逼！
       program main
       implicit real*8 (a-h,o-z)
       integer imax,jmax,nxy,nb
@@ -17,7 +18,7 @@ cc    test case
       in_flag(2) = 1
       in_flag(6) = 1
 
-      
+
       do i=1,nb
           bxnb(i) = 0.1
           bynb(i) = 0.1
